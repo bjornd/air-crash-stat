@@ -1,0 +1,39 @@
+Parameters:
+  Date
+  Time
+  Aircraft type:
+    Manufacturer
+    Country
+    Total built
+  Operator:
+    Name
+    Country
+  First flight
+  Fatalities
+  Occupants
+  Coordinates:
+    Country
+  Departure
+  Destination
+  Phase
+  Airplane damage
+  
+Calculated parameters:
+  Fatality rate: Fatalities / Occupants
+  Aircraft safety: Number of Destroyed / Total built
+  
+Visualizations:
+  Spots on map (color is fatality rate)
+  Choropleth map:
+    Parameter1:
+      Aircraft type -> Country
+      Operator -> Country
+    Parameter2:
+      Aircraft safety
+      Number of incidents
+  Types of aircraft:
+    Aircraft safety
+  Timeline:
+    Number of incidents
+    Fatalities
+      
