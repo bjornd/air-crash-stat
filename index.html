@@ -2,6 +2,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Air crash stat</title>
+  <link rel="stylesheet" media="all" href="external/jvectormap/jquery-jvectormap.css"/>
   <style>
     html, body, .map {
       height: 100%;
@@ -15,8 +16,45 @@
   <script src="js/jquery-jvectormap-world-mill-en.js"></script>
   <script>
     $(function(){
-      $('.map').vectorMap({
-        map: 'world_mill_en'
+      $.getJSON('data/output.json', function(data){
+        var i,
+            markers = {},
+            markersData = [{}, {}],
+            map;
+
+        for (i = 0; i < data.length; i++) {
+          if (data[i]['location']) {
+            markers[ data[i]['id'] ] = {
+              latLng: [data[i]['location'].latitude, data[i]['location'].longitude],
+              name: data[i]['id']
+            };
+            markersData[0][ data[i]['id'] ] = data[i]['fatalities'] / data[i]['occupants'];
+            markersData[1][ data[i]['id'] ] = data[i]['fatalities'];
+          }
+        }
+
+        map = new jvm.WorldMap({
+          map: 'world_mill_en',
+          container: $('.map'),
+          markerStyle: {
+            initial: {
+              fill: 'yellow'
+            }
+          },
+          series: {
+            markers: [{
+              attribute: 'fill',
+              scale: ['#FFFFB2', '#E31A1C']
+            },{
+              attribute: 'r',
+              scale: [5, 12]
+            }]
+          },
+          onMarkerClick: function(e, code){
+            window.open('http://aviation-safety.net/database/record.php?id='+code);
+          }
+        });
+        map.addMarkers(markers, markersData);
       });
     })
   </script>
