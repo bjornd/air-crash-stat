@@ -23,7 +23,7 @@ class CountryCodes
 end
 
 class Grabber
-  @@accidents_url = 'http://aviation-safety.net/database/dblist.php?Year=%year%'
+  @@accidents_url = 'http://aviation-safety.net/database/dblist.php?Year=%year%&page=%page%'
   @@accident_url = 'http://aviation-safety.net/database/record.php?id=%id%'
   @@accident_map_url = 'http://aviation-safety.net/database/record_map.php?id=%id%'
 
@@ -35,13 +35,13 @@ class Grabber
       File.open('cache/'+url_hash, 'r:iso-8859-1') { |f| response = f.read }
     else
       response = Net::HTTP.get(URI.parse(URI.escape(url))).force_encoding('iso-8859-1');
-      File.open('cache/'+url_hash, "w") { |f| file.write( response ) }
+      File.open('cache/'+url_hash, "w") { |f| f.write( response ) }
     end
     response
   end
 
-  def self.grab_accidents(year)
-    Grabber.grab( @@accidents_url.sub('%year%', year.to_s) )
+  def self.grab_accidents(year, page = 1)
+    Grabber.grab( @@accidents_url.sub('%year%', year.to_s).sub('%page%', page.to_s) )
   end
 
   def self.grab_accident(id)
@@ -55,8 +55,23 @@ end
 
 class Parser
   def self.parse_accidents(year)
-    data = []
     doc = Nokogiri::HTML(Grabber.grab_accidents(year))
+    pager = doc.at_css('.pagenumbers')
+    pages_number = 1
+    if pager
+      pages_number = pager.css('span, a').length
+    end
+
+    data = []
+    (1..pages_number).each do |number|
+      data.concat( Parser.parse_accidents_page(year, number) )
+    end
+    data
+  end
+
+  def self.parse_accidents_page(year, page)
+    data = []
+    doc = Nokogiri::HTML(Grabber.grab_accidents(year, page))
     doc.css('#contentcolumn table tr').each do |row|
       if row.css('td')[8] && row.css('td')[8].content == 'A1'
         id = row.css('td')[0].at_css('a').attribute('href').value.split('=').last
@@ -83,7 +98,11 @@ class Parser
         when 'Type:'
           data[:type_id] = cells[1].css('a').attribute('href').value.split('=').last.to_i
         when 'Operator:'
-          data[:operator_id] = cells[1].css('a').attribute('href').value.split('=').last.to_i
+          if cells[1].at_css('a')
+            data[:operator_id] = cells[1].at_css('a').attribute('href').value.split('=').last.to_i
+          else
+            data[:operator_id] = nil
+          end
         when 'First flight:'
           data[:first_flight] = cells[1].content.strip
         when 'Location:'

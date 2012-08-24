@@ -1,3 +1,5 @@
 .DS_Store
 air-crash.tmproj
 data/cache
+js/jquery-jvectormap.min.js
+data/output.json
