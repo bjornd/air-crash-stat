@@ -26,6 +26,8 @@ class Grabber
   @@accidents_url = 'http://aviation-safety.net/database/dblist.php?Year=%year%&page=%page%'
   @@accident_url = 'http://aviation-safety.net/database/record.php?id=%id%'
   @@accident_map_url = 'http://aviation-safety.net/database/record_map.php?id=%id%'
+  @@aircraft_type_url = 'http://aviation-safety.net/database/type/type-general.php?type=%id%'
+  @@operator_url = 'http://aviation-safety.net/database/operator/airline.php?var=%id%'
 
   def self.grab(url)
     puts url
@@ -51,6 +53,14 @@ class Grabber
   def self.grab_accident_map(id)
     Grabber.grab( @@accident_map_url.sub('%id%', id) )
   end
+
+  def self.grab_operator(id)
+    Grabber.grab( @@operator_url.sub('%id%', id) )
+  end
+
+  def self.grab_aircraft_type(id)
+    Grabber.grab( @@aircraft_type_url.sub('%id%', id) )
+  end
 end
 
 class Parser
@@ -62,11 +72,24 @@ class Parser
       pages_number = pager.css('span, a').length
     end
 
-    data = []
+    accidents = []
     (1..pages_number).each do |number|
-      data.concat( Parser.parse_accidents_page(year, number) )
+      accidents.concat( Parser.parse_accidents_page(year, number) )
     end
-    data
+
+    operators = {}
+    accidents.each do |accident|
+      if accident[:operator_id] && !operators[accident[:operator_id]]
+        operators[accident[:operator_id]] = parse_operator(accident[:operator_id])
+      end
+    end
+
+    aircrafts = {}
+    accidents.each do |accident|
+      aircrafts[accident[:type_id]] = parse_aircraft_type(accident[:type_id]) unless aircrafts[accident[:type_id]]
+    end
+
+    {accidents: accidents, operators: operators, aircrafts: aircrafts}
   end
 
   def self.parse_accidents_page(year, page)
@@ -96,10 +119,10 @@ class Parser
         when 'Time:'
           data[:time] = cells[1].content
         when 'Type:'
-          data[:type_id] = cells[1].css('a').attribute('href').value.split('=').last.to_i
+          data[:type_id] = cells[1].css('a').attribute('href').value.split('=').last
         when 'Operator:'
           if cells[1].at_css('a')
-            data[:operator_id] = cells[1].at_css('a').attribute('href').value.split('=').last.to_i
+            data[:operator_id] = cells[1].at_css('a').attribute('href').value.split('=').last
           else
             data[:operator_id] = nil
           end
@@ -131,6 +154,49 @@ class Parser
     else
       return nil
     end
+  end
+
+  def self.parse_aircraft_type(id)
+    data = {}
+    data[:id] = id
+    doc = Nokogiri::HTML(Grabber.grab_aircraft_type(id))
+    data[:name] = doc.at_css('.pagetitle').content[0..-7]
+    doc.css('#contentcolumn table tr').each do |row|
+      cells = row.css('td')
+      case cells[0].content
+      when 'Manufacturer:'
+        data[:manufacturer] = cells[1].content
+      when 'Country:'
+        coutry_name = cells[1].content.strip
+        if coutry_name && coutry_name.length > 0
+          data[:country_code] = CountryCodes.get_code_by_name( coutry_name )
+        else
+          data[:country_code] = nil
+        end
+      when 'Production total:'
+        if cells[1]
+          match = /\d+/.match(cells[1])
+          data[:built] = match ? match[0].to_i : nil
+        else
+          data[:built] = nil
+        end
+      end
+    end
+    data
+  end
+
+  def self.parse_operator(id)
+    data = {}
+    data[:id] = id
+    doc = Nokogiri::HTML(Grabber.grab_operator(id))
+    data[:name] = doc.at_css('.pagetitle')
+    coutry_name = doc.at_css('.infobox').css('.caption')[1].content
+    if coutry_name && coutry_name.length > 0
+      data[:country_code] = CountryCodes.get_code_by_name( coutry_name )
+    else
+      data[:country_code] = nil
+    end
+    data
   end
 end
 
