@@ -3,3 +3,5 @@ air-crash.tmproj
 data/cache
 js/jquery-jvectormap.min.js
 data/output.json
+data/departures.json
+external/dojo-release-1.8.0-src/

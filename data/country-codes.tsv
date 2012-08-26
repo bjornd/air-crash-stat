@@ -31,6 +31,7 @@ BO	Bolivia
 BQ	Bonaire, Sint Eustatius and Saba
 BR	Brazil
 BS	Bahamas
+BS	Bahamas, The
 BT	Bhutan
 BV	Bouvet Island
 BW	Botswana
@@ -40,10 +41,13 @@ CA	Canada
 CC	Cocos (Keeling) Islands
 CD	Congo, the Democratic Republic of the
 CD	Congo (Democratic Republic)
+CD	Congo, Dem. Rep.
 CF	Central African Republic
 CG	Congo
+CG	Congo, Rep.
 CH	Switzerland
 CI	Côte d'Ivoire
+CI	Cote d'Ivoire
 CK	Cook Islands
 CL	Chile
 CM	Cameroon
@@ -65,6 +69,7 @@ DZ	Algeria
 EC	Ecuador
 EE	Estonia
 EG	Egypt
+EG	Egypt, Arab Rep.
 EH	Western Sahara
 ER	Eritrea
 ES	Spain
@@ -73,6 +78,7 @@ FI	Finland
 FJ	Fiji
 FK	Falkland Islands (Malvinas)
 FM	Micronesia, Federated States of
+FM	Micronesia
 FO	Faroe Islands
 FR	France
 GA	Gabon
@@ -95,6 +101,7 @@ GU	Guam
 GW	Guinea-Bissau
 GY	Guyana
 HK	Hong Kong
+HK	Hong Kong SAR, China
 HM	Heard Island and McDonald Islands
 HN	Honduras
 HR	Croatia
@@ -108,6 +115,7 @@ IN	India
 IO	British Indian Ocean Territory
 IQ	Iraq
 IR	Iran
+IR	Iran, Islamic Rep.
 IS	Iceland
 IT	Italy
 JE	Jersey
@@ -116,17 +124,23 @@ JO	Jordan
 JP	Japan
 KE	Kenya
 KG	Kyrgyzstan
+KG	Kyrgyz Republic
 KH	Cambodia
 KI	Kiribati
 KM	Comoros
 KN	Saint Kitts and Nevis
+KN	St. Kitts and Nevis
 KP	Korea, Democratic People's Republic of
+KP	Korea, Dem. Rep.
 KR	Korea, Republic of
+KR	Korea, Rep.
 KR	South Korea
 KW	Kuwait
 KY	Cayman Islands
 KZ	Kazakhstan
 LA	Lao People's Democratic Republic
+LA	Lao PDR
+LA	Laos
 LB	Lebanon
 LC	Saint Lucia
 LI	Liechtenstein
@@ -140,15 +154,18 @@ LY	Libya
 MA	Morocco
 MC	Monaco
 MD	Moldova, Republic of
+MD	Moldova
 ME	Montenegro
 MF	Saint Martin (French part)
 MG	Madagascar
 MH	Marshall Islands
 MK	Macedonia, the former Yugoslav Republic of
+MK	Macedonia, FYR
 ML	Mali
 MM	Myanmar
 MN	Mongolia
 MO	Macao
+MO	Macao SAR, China
 MP	Northern Mariana Islands
 MQ	Martinique
 MR	Mauritania
@@ -167,6 +184,7 @@ NF	Norfolk Island
 NG	Nigeria
 NI	Nicaragua
 NL	Netherlands
+NL	Netherlands Antilles
 NO	Norway
 NP	Nepal
 NR	Nauru
@@ -204,6 +222,7 @@ SH	Saint Helena, Ascension and Tristan da Cunha
 SI	Slovenia
 SJ	Svalbard and Jan Mayen
 SK	Slovakia
+SK	Slovak Republic
 SL	Sierra Leone
 SM	San Marino
 SN	Senegal
@@ -223,6 +242,7 @@ TH	Thailand
 TJ	Tajikistan
 TK	Tokelau
 TL	Timor-Leste
+TL	East Timor
 TM	Turkmenistan
 TN	Tunisia
 TO	Tonga
@@ -230,7 +250,9 @@ TR	Turkey
 TT	Trinidad and Tobago
 TV	Tuvalu
 TW	Taiwan, Province of China
+TW	Taiwan
 TZ	Tanzania, United Republic of
+TZ	Tanzania
 UA	Ukraine
 UG	Uganda
 UM	United States Minor Outlying Islands
@@ -241,15 +263,21 @@ UZ	Uzbekistan
 VA	Holy See (Vatican City State)
 VC	Saint Vincent and the Grenadines
 VE	Venezuela, Bolivarian Republic of
+VE	Venezuela, RB
+VE	Venezuela
 VG	Virgin Islands, British
+VG	British Virgin Islands
 VI	Virgin Islands, U.S.
 VN	Viet Nam
+МТ	Vietnam
 VU	Vanuatu
 WF	Wallis and Futuna
 WS	Samoa
 YE	Yemen
+YE	Yemen, Rep.
 YT	Mayotte
 ZA	South Africa
 ZM	Zambia
 ZW	Zimbabwe
 ZZ	Pacific Ocean
+ZZ	Atlantic Ocean

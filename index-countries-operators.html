@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Air crash stat</title>
+  <link rel="stylesheet" media="all" href="external/jvectormap/jquery-jvectormap.css"/>
+  <style>
+    html, body, .map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+  <script src="js/jquery-1.7.2.min.js"></script>
+  <script src="js/jquery-jvectormap.min.js"></script>
+  <script src="js/jquery-jvectormap-world-mill-en.js"></script>
+  <script>
+    $(function(){
+      $.when($.getJSON('data/output.json'), $.getJSON('data/departures.json')).done(function(){
+        var i,
+            countriesData = {},
+            fatalitiesByCountry = {},
+            countryCode,
+            data = arguments[0][0],
+            departures = arguments[1][0];
+
+        for (i = 0; i < data.accidents.length; i++) {
+          if (data.accidents[i]['operator_id'] && data.operators[ data.accidents[i]['operator_id'] ]['country_code']) {
+            countryCode = data.operators[ data.accidents[i]['operator_id'] ]['country_code'];
+            fatalitiesByCountry[ countryCode ] = fatalitiesByCountry[ countryCode ] || 0;
+            fatalitiesByCountry[ countryCode ] += 1;
+          }
+        }
+
+        for (i in departures) {
+          if (fatalitiesByCountry[i]) {
+            countriesData[i] = fatalitiesByCountry[i] / departures[i];
+          }
+        }
+
+        map = new jvm.WorldMap({
+          map: 'world_mill_en',
+          container: $('.map'),
+          series: {
+            regions: [{
+              attribute: 'fill',
+              scale: ["#1A9641", "#A6D96A", "#FFFFBF", "#FDAE61", "#D7191C"],
+              values: countriesData,
+              normalizeFunction: function(value) {
+                return Math.pow(value, 0.001);
+              }
+            }],
+          },
+          onMarkerClick: function(e, code){
+            window.open('http://aviation-safety.net/database/record.php?id='+code);
+          },
+          onRegionLabelShow: function(e, label, code){
+            if (countriesData[code]) {
+              label.html(label.html()+': '+Math.round(countriesData[code]*1e6));
+            }
+          }
+        });
+      });
+    })
+  </script>
+</head>
+<body>
+  <div class="map"></div>
+</body>
+</html>

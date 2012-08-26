@@ -3,9 +3,10 @@ require 'json'
 require 'digest'
 require 'net/http'
 require 'nokogiri'
+require 'optparse'
 
 class CountryCodes
-  @@file_name = 'coutry-codes.tsv'
+  @@file_name = 'country-codes.tsv'
   @@data = nil
 
   def self.load_data
@@ -30,7 +31,7 @@ class Grabber
   @@operator_url = 'http://aviation-safety.net/database/operator/airline.php?var=%id%'
 
   def self.grab(url)
-    puts url
+    #puts url
     url_hash = Digest::MD5.hexdigest(url)
     response = nil
     if File.exist?('cache/'+url_hash)
@@ -64,17 +65,19 @@ class Grabber
 end
 
 class Parser
-  def self.parse_accidents(year)
-    doc = Nokogiri::HTML(Grabber.grab_accidents(year))
-    pager = doc.at_css('.pagenumbers')
-    pages_number = 1
-    if pager
-      pages_number = pager.css('span, a').length
-    end
-
+  def self.parse_accidents(year_from, year_to)
     accidents = []
-    (1..pages_number).each do |number|
-      accidents.concat( Parser.parse_accidents_page(year, number) )
+    (year_from..year_to).each do |year|
+      doc = Nokogiri::HTML(Grabber.grab_accidents(year))
+      pager = doc.at_css('.pagenumbers')
+      pages_number = 1
+      if pager
+        pages_number = pager.css('span, a').length
+      end
+
+      (1..pages_number).each do |number|
+        accidents.concat( Parser.parse_accidents_page(year, number) )
+      end
     end
 
     operators = {}
@@ -115,7 +118,11 @@ class Parser
       if cells.length == 2
         case cells[0].content
         when 'Date:'
-          data[:date] = Date.parse(cells[1].content)
+          begin
+            data[:date] = Date.parse(cells[1].content)
+          rescue ArgumentError
+            data[:date] = nil
+          end
         when 'Time:'
           data[:time] = cells[1].content
         when 'Type:'
@@ -198,6 +205,29 @@ class Parser
     end
     data
   end
+
+  def self.parse_departures
+    data = {}
+    CSV.foreach('departures.csv', encoding: "UTF-8") do |row|
+      count = 0
+      sum = 0
+      (2..row.length).each do |i|
+        if row[i]
+          count += 1
+          sum += row[i].to_i
+        end
+      end
+      data[ CountryCodes.get_code_by_name( row[0] ) ] = sum / count if count > 0
+    end
+    data
+  end
 end
 
-File.open('output.json', 'w') { |f| f.write( Parser.parse_accidents(2011).to_json ) }
+data_type = ARGV[0]
+if !data_type || data_type == 'accidents'
+  puts 'Grabbing accidents data'
+  File.open('output.json', 'w') { |f| f.write( Parser.parse_accidents(2001, 2011).to_json ) }
+elsif data_type == 'departures'
+  puts 'Parsing departures data'
+  File.open('departures.json', 'w') { |f| f.write( Parser.parse_departures().to_json ) }
+end

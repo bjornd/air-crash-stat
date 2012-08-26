@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Air crash stat</title>
+  <link rel="stylesheet" media="all" href="external/jvectormap/jquery-jvectormap.css"/>
+  <style>
+    html, body, .map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+  <script src="js/jquery-1.7.2.min.js"></script>
+  <script src="js/jquery-jvectormap.min.js"></script>
+  <script src="js/jquery-jvectormap-world-mill-en.js"></script>
+  <script>
+    $(function(){
+      $.getJSON('data/output.json', function(data){
+        var i,
+            countriesData = {},
+            countryCode;
+
+        for (i = 0; i < data.accidents.length; i++) {
+          if (data.accidents[i]['country_code']) {
+            countryCode = data.accidents[i]['country_code'];
+            countriesData[ countryCode ] = countriesData[ countryCode ] || 0;
+            countriesData[ countryCode ] += data.accidents[i]['fatalities'];
+          }
+        }
+
+        map = new jvm.WorldMap({
+          map: 'world_mill_en',
+          container: $('.map'),
+          series: {
+            regions: [{
+              attribute: 'fill',
+              scale: ['#FFFFB2', '#E31A1C'],
+              values: countriesData
+            }]
+          },
+          onMarkerClick: function(e, code){
+            window.open('http://aviation-safety.net/database/record.php?id='+code);
+          }
+        });
+      });
+    })
+  </script>
+</head>
+<body>
+  <div class="map"></div>
+</body>
+</html>
